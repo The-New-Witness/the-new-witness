@@ -3,6 +3,9 @@
 .env.local
 
 # Editor
+.env.*.local
+
+# IDE
 .vscode/
 .idea/
 *.swp
