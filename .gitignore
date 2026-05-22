@@ -1,6 +1,8 @@
 # Environment
 .env
 .env.local
+
+# Editor
 .env.*.local
 
 # IDE
@@ -8,6 +10,7 @@
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
