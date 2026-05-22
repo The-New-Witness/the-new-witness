@@ -1,0 +1,17 @@
+# Environment
+.env
+.env.local
+
+# Editor
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
