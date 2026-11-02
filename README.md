@@ -32,8 +32,10 @@ The New Witness is a system for documenting and preserving truth in the face of 
 
 - `replit.sh` — Deployment script
 - `template.notion.md` — Notion integration template
-- `the-new-witness-full.zip` — Full system archive
-- `.github/workflows/codeql.yml` — CodeQL security analysis
+- `the-new-witness-full.zip` — Project distribution archive, including scaffolding and placeholders
+- `.github/workflows/validate-archive.yml` — Archive integrity and validation tests
+
+Archive validation checks required entries, CRC integrity, duplicate paths, unsafe paths, and symlinks without extracting or executing the archive. It does not establish that placeholder application components are implemented. CodeQL uses the repository's existing default setup; a duplicate advanced workflow is not required.
 
 ## License
 
