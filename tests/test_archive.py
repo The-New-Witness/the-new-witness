@@ -19,6 +19,19 @@ class ArchiveTests(unittest.TestCase):
                 archive.writestr(name, 'content')
         return path
 
+    def fixture_raw_path(self, raw_name):
+        # ZipInfo normalizes backslashes when constructing a fixture on Windows.
+        # Replace both ZIP header names after writing to preserve the raw bytes.
+        safe = b'folder/outside'
+        self.assertEqual(len(safe), len(raw_name))
+        path = self.fixture([safe.decode('ascii')])
+        data = path.read_bytes()
+        self.assertEqual(data.count(safe), 2)
+        path.write_bytes(data.replace(safe, raw_name))
+        with zipfile.ZipFile(path) as archive:
+            self.assertEqual(archive.infolist()[0].orig_filename, raw_name.decode('ascii'))
+        return path
+
     def test_existing_project_archive(self):
         self.assertGreater(validate(Path(__file__).resolve().parents[1] / 'the-new-witness-full.zip'), 0)
 
@@ -31,9 +44,17 @@ class ArchiveTests(unittest.TestCase):
             validate(self.fixture(['../outside']), required=set())
 
     def test_absolute_or_windows_path(self):
-        for name in ['/outside', 'C:/outside', 'folder\\outside']:
+        for name in ['/outside', 'C:/outside']:
             with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'Unsafe archive path'):
                 validate(self.fixture([name]), required=set())
+
+    def test_raw_windows_separator(self):
+        with self.assertRaisesRegex(ValueError, 'Unsafe archive path'):
+            validate(self.fixture_raw_path(b'folder\\outside'), required=set())
+
+    def test_raw_nul(self):
+        with self.assertRaisesRegex(ValueError, 'Unsafe archive path'):
+            validate(self.fixture_raw_path(b'folder\x00outside'), required=set())
 
     def test_duplicate_path(self):
         with self.assertRaisesRegex(ValueError, 'Duplicate archive path'):
