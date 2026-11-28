@@ -15,9 +15,11 @@ def validate(path, required=REQUIRED):
     with zipfile.ZipFile(path) as archive:
         seen = set()
         for entry in archive.infolist():
-            name = entry.filename
+            # Inspect the original archive name before zipfile normalizes Windows
+            # separators or truncates a name at an embedded NUL.
+            name = entry.orig_filename
             parts = PurePosixPath(name).parts
-            if not name or name.startswith('/') or '\\' in name or ':' in name or '..' in parts:
+            if not name or '\x00' in name or name.startswith('/') or '\\' in name or ':' in name or '..' in parts:
                 raise ValueError(f'Unsafe archive path: {name!r}')
             if name in seen:
                 raise ValueError(f'Duplicate archive path: {name!r}')
